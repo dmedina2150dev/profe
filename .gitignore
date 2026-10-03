@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# profe — reglas de ignorado de la raíz del repositorio.
+# Este archivo se entrega en el bloque Bootstrap de §10, ANTES del primer
+# commit. Una ruta que git ya rastrea nunca vuelve a ser excluida por una
+# regla de ignorado, así que el orden no es negociable.
+# ---------------------------------------------------------------------------
+
+node_modules/
+.DS_Store
+*.log
+.workspace-applied
+the_profe-app/LICENSE
+
+# Salida de compilación del backend
+the_profe-server/dist/
+
+# Expo / React Native
+the_profe-app/.expo/
+the_profe-app/dist/
+the_profe-app/web-build/
+the_profe-app/ios/
+the_profe-app/android/
+
+# ---------------------------------------------------------------------------
+# Variables de entorno: se ignoran los valores reales, se COMMITEAN los
+# ejemplos. La negación va DESPUÉS del patrón que anula, o no tiene efecto.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!the_profe-server/.env.example
+!the_profe-app/.env.example
+
+# ---------------------------------------------------------------------------
+# El espacio de trabajo del agente SÍ se commitea: lo lee cada sesión.
+# Algunos andamiajes ignoran `.claude/`; aquí se anula explícitamente.
+# ---------------------------------------------------------------------------
+!.claude/
+!.claude/**
+.claude/settings.local.json
+
+# El bundle del blueprint se commitea íntegro: es la fuente del build.
+!blueprints/
+!blueprints/**

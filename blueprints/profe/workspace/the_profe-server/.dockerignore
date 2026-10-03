@@ -1,0 +1,15 @@
+# Está en su sitio antes de la primera construcción de imagen: su propósito es
+# cambiar lo que `docker build` ve, así que llega antes del comando que gobierna.
+node_modules
+dist
+tests
+scripts
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+# El bundle del blueprint vive dentro del proyecto. Nunca entra en la imagen.
+../blueprints
+blueprints

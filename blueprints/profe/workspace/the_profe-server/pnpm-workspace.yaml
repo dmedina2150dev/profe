@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# profe — ajustes de pnpm del BACKEND.
+#
+# POR QUÉ ESTE ARCHIVO Y NO `.npmrc`: pnpm moderno lee de `.npmrc` **sólo**
+# autenticación y registro. Todo lo demás vive aquí.
+#
+# Se copia dentro de la imagen de Docker: ver `Dockerfile`. Sin él, la
+# instalación dentro de la imagen no reconoce ningún script aprobado y falla
+# allí en vez de en tu máquina.
+# ---------------------------------------------------------------------------
+
+# AQUÍ NO SE TOCA `nodeLinker`. Se conserva el aislado por defecto, que es el que
+# impide que un paquete importe algo que no declaró —dependencias fantasma— y es
+# el que de verdad aporta seguridad. El cliente sí necesita `hoisted` porque
+# Metro lo exige; el backend no tiene esa restricción, así que no la hereda.
+# Un solo `pnpm-workspace.yaml` compartido en la raíz habría degradado el
+# servidor al enlazado del cliente, que es justo lo que no queremos en el
+# paquete que maneja las claves de Azure, Anthropic, Gemini y Supabase.
+
+# Scripts de instalación permitidos. pnpm NO ejecuta scripts de dependencias que
+# no estén aquí, y con `strictDepBuilds` (activo por defecto) la instalación
+# FALLA en vez de avisar. Lista de partida; la primera instalación añadirá con
+# valor provisional lo que falte, para que lo revises una por una.
+allowBuilds:
+  "@biomejs/biome": true
+  esbuild: true
+  # Revisado el 2026-09-30, leyendo el tarball del registro, no suponiéndolo.
+  #
+  # @google/genai: su único script de instalación es
+  #   "preinstall": "echo 'preinstall: no-op'"
+  # que imprime una cadena y termina. Tiene también un `prepare`, pero `prepare`
+  # NO se ejecuta al instalar desde un tarball del registro — solo para
+  # dependencias de git o para el propio paquete. Riesgo nulo.
+  "@google/genai": true
+  # protobufjs: lo arrastra @google/genai para el proto de sentencepiece.
+  # Su `postinstall` lee su propio package.json, comprueba si quien lo declara
+  # usó `~` o `^`, y escribe un aviso en stderr si no coincide. Leído entero:
+  # no abre red, no escribe archivos y no lanza procesos — solo `path`,
+  # `fs.readFileSync` y `process.stderr.write`. Riesgo nulo.
+  protobufjs: true
+
+# Retraso mínimo antes de adoptar una versión recién publicada, en minutos.
+# 1440 = 24 horas. Por defecto desde pnpm 11; explícito para que se lea.
+minimumReleaseAge: 1440

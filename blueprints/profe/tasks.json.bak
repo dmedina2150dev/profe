@@ -1,0 +1,568 @@
+[
+  {
+    "id": "E1-T1",
+    "title": "Tokens de diseño, tres fuentes y tema claro/oscuro",
+    "epic": "01-fundamentos",
+    "dependencies": [],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO `pnpm --dir the_profe-app run test` se ejecuta EL SISTEMA DEBERÁ salir con 0, 0 fallos y 0 omitidos.",
+      "CUANDO se resuelve la paleta semántica EL SISTEMA DEBERÁ devolver un valor hexadecimal para cada token del tema claro y del oscuro, sin ninguno indefinido.",
+      "CUANDO se resuelve el tema oscuro EL SISTEMA DEBERÁ devolver `#1E1B17` para `bg` y `#F0EADF` para `text`, y nunca `#000000` ni `#FFFFFF` para fondo o texto.",
+      "CUANDO el usuario no ha elegido tema EL SISTEMA DEBERÁ usar la preferencia del sistema como valor inicial, y CUANDO ha elegido uno explícitamente EL SISTEMA DEBERÁ usar el elegido y persistirlo.",
+      "CUANDO se registran las familias tipográficas EL SISTEMA DEBERÁ exponer `SourceSerif4` para portugués, `Inter` para interfaz y `CharisSIL` para el Alfabeto Fonético Internacional, con los tres archivos presentes en `the_profe-app/assets/fonts/`.",
+      "CUANDO `pnpm --dir the_profe-app run lint` se ejecuta EL SISTEMA DEBERÁ salir con 0, sin errores ni advertencias."
+    ],
+    "verify": [
+      "test -f the_profe-app/assets/fonts/SourceSerif4-Regular.ttf",
+      "test -f the_profe-app/assets/fonts/Inter-Regular.ttf",
+      "test -f the_profe-app/assets/fonts/CharisSIL-Regular.ttf",
+      "pnpm --dir the_profe-app run typecheck",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-01-tokens-tema",
+    "files": [
+      "the_profe-app/constants/theme.ts",
+      "the_profe-app/lib/theme-context.tsx",
+      "the_profe-app/app/_layout.tsx",
+      "the_profe-app/tests/theme.test.ts",
+      "the_profe-app/tests/tokens.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T2",
+    "title": "Esqueleto de navegación con pestañas y estados vacíos",
+    "epic": "01-fundamentos",
+    "dependencies": ["E1-T1"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se monta el enrutador EL SISTEMA DEBERÁ registrar exactamente las rutas de pestaña `/`, `/practicar` y `/ajustes`, y ninguna otra pestaña.",
+      "CUANDO una pantalla de lista no tiene datos EL SISTEMA DEBERÁ renderizar un estado vacío con texto, y nunca una lista en blanco sin explicación.",
+      "CUANDO una pantalla está cargando EL SISTEMA DEBERÁ renderizar un estado de carga, y CUANDO su fuente de datos falla EL SISTEMA DEBERÁ renderizar un estado de error con un botón de reintento alcanzable por teclado.",
+      "CUANDO se renderiza la barra de pestañas EL SISTEMA DEBERÁ dar a cada destino un área táctil de al menos 44 por 44 píxeles y una etiqueta accesible, nunca sólo un icono.",
+      "CUANDO `pnpm --dir the_profe-app run test` se ejecuta EL SISTEMA DEBERÁ salir con 0, 0 fallos y 0 omitidos."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-app run typecheck",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-02-navegacion",
+    "files": [
+      "the_profe-app/app/(tabs)/_layout.tsx",
+      "the_profe-app/app/(tabs)/index.tsx",
+      "the_profe-app/app/(tabs)/practicar.tsx",
+      "the_profe-app/app/(tabs)/ajustes.tsx",
+      "the_profe-app/tests/navigation.test.tsx"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T3",
+    "title": "Esquema Postgres, índices y políticas RLS",
+    "epic": "01-fundamentos",
+    "dependencies": [],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO `pnpm --dir the_profe-server run db:local:reset` se ejecuta contra una base vacía EL SISTEMA DEBERÁ crear todas las tablas que el esquema define y salir con 0.",
+      "CUANDO `pnpm --dir the_profe-server run db:local:assert` se ejecuta EL SISTEMA DEBERÁ resolver como `regclass`, sin error, cada tabla del esquema, incluidas `curriculum_units`, `profiles`, `audio_assets`, `budget_ledger` y `voice_sessions`.",
+      "CUANDO un perfil autenticado consulta `attempts` EL SISTEMA DEBERÁ devolver sólo sus propias filas, y CUANDO consulta las de otro perfil EL SISTEMA DEBERÁ devolver cero filas en lugar de un error.",
+      "CUANDO cualquier perfil autenticado consulta `audio_assets` con `kind = 'tts_cache'` EL SISTEMA DEBERÁ devolver la fila, y CUANDO consulta un `kind = 'user_recording'` de otro perfil EL SISTEMA DEBERÁ devolver cero filas.",
+      "CUANDO se intenta un `UPDATE` o un `DELETE` sobre `budget_ledger` EL SISTEMA DEBERÁ abortar con una excepción que nombre la tabla como append-only.",
+      "CUANDO se insertan dos filas de `audio_assets` con el mismo `text_hash`, la misma `voice` y `kind = 'tts_cache'` EL SISTEMA DEBERÁ rechazar la segunda por violación del índice único."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run db:local:up",
+      "pnpm --dir the_profe-server run db:local:apply",
+      "pnpm --dir the_profe-server run db:local:assert",
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run test tests/db/rls.test.ts"
+    ],
+    "checkpoint": "step-03-esquema-rls",
+    "files": [
+      "supabase/migrations/**",
+      "the_profe-server/src/env.ts",
+      "the_profe-server/src/db/pool.ts",
+      "the_profe-server/tests/sql/assert_schema.sql",
+      "the_profe-server/tests/db/rls.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E1-T4",
+    "title": "Auth con almacenamiento seguro y borrado de cuenta",
+    "epic": "01-fundamentos",
+    "dependencies": ["E1-T2", "E1-T3"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se inicia sesión con un enlace mágico válido EL SISTEMA DEBERÁ crear una fila en `profiles` con `id` igual al del usuario de `auth.users` y guardar el token en `expo-secure-store`, nunca en AsyncStorage.",
+      "CUANDO no hay sesión y se abre una ruta protegida EL SISTEMA DEBERÁ redirigir a `/entrar` en lugar de renderizar la pantalla vacía.",
+      "CUANDO un perfil autenticado llama a `public.delete_my_account()` EL SISTEMA DEBERÁ borrar su fila de `profiles`, cascadear a sus `lessons`, `attempts`, `error_items`, `conversations` y `audio_assets` propios, y borrar su fila de `auth.users`.",
+      "CUANDO `public.delete_my_account()` se llama sin sesión EL SISTEMA DEBERÁ abortar con una excepción y no borrar ninguna fila.",
+      "CUANDO un perfil borra su cuenta EL SISTEMA DEBERÁ conservar las filas de `audio_assets` con `kind = 'tts_cache'`, porque la caché es compartida y no le pertenece.",
+      "CUANDO `pnpm --dir the_profe-app run test` se ejecuta EL SISTEMA DEBERÁ salir con 0, 0 fallos y 0 omitidos."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/db/account-deletion.test.ts",
+      "pnpm --dir the_profe-app run typecheck",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-04-auth-borrado",
+    "files": [
+      "the_profe-app/lib/supabase.ts",
+      "the_profe-app/lib/session.tsx",
+      "the_profe-app/app/(auth)/entrar.tsx",
+      "supabase/migrations/**",
+      "the_profe-server/tests/db/account-deletion.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T1",
+    "title": "Backend Hono con entorno validado y salud ejecutable",
+    "epic": "02-columna-agente",
+    "dependencies": ["E1-T3"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO `pnpm --dir the_profe-server run build` se ejecuta EL SISTEMA DEBERÁ emitir `the_profe-server/dist/server.js`, que es exactamente la ruta que declara `main` en `the_profe-server/package.json` y la que arranca el `CMD` del Dockerfile.",
+      "CUANDO se arranca el artefacto construido y se pide `GET /healthz` EL SISTEMA DEBERÁ responder 200 con `ok` en verdadero y comprobar que la base de datos acepta una consulta, no sólo que el proceso está vivo.",
+      "CUANDO se pide una ruta inexistente bajo `/api/v1/` EL SISTEMA DEBERÁ responder 404 con el sobre de error y `code` igual a `NOT_FOUND`.",
+      "CUANDO un cuerpo de petición no valida contra su esquema EL SISTEMA DEBERÁ responder 422 con `code` igual a `VALIDATION_FAILED` y no ejecutar ninguna lógica de negocio.",
+      "CUANDO falta una variable de entorno que el paso 5 declara obligatoria EL SISTEMA DEBERÁ fallar al arrancar con un error que la nombre, en lugar de servir tráfico con un valor por defecto.",
+      "CUANDO `node the_profe-server/scripts/check-env.ts` se ejecuta con el entorno completo EL SISTEMA DEBERÁ salir con 0 e imprimir un resumen sin revelar ningún valor secreto."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run build",
+      "test -f the_profe-server/dist/server.js",
+      "node the_profe-server/scripts/check-env.ts",
+      "pnpm --dir the_profe-server run db:local:up",
+      "pnpm --dir the_profe-server run test tests/http/health.test.ts",
+      "pnpm --dir the_profe-server run start & sleep 3; curl -sf http://127.0.0.1:8787/healthz | jq -e '.ok == true'; RC=$?; pkill -f 'node dist/server.js' 2>/dev/null; exit $RC",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-05-backend-hono",
+    "files": [
+      "the_profe-server/src/envelope.ts",
+      "the_profe-server/src/app.ts",
+      "the_profe-server/src/server.ts",
+      "the_profe-server/src/env.ts",
+      "the_profe-server/tests/http/health.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T2",
+    "title": "Pasarela de modelo con trazas de coste y tokens",
+    "epic": "02-columna-agente",
+    "dependencies": ["E2-T1"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO la pasarela completa una llamada a Claude EL SISTEMA DEBERÁ insertar exactamente una fila en `traces` con `provider` igual a `anthropic`, los tokens de entrada, salida y caché, `cost_micros` calculado desde el módulo de precios y `latency_ms`.",
+      "CUANDO una llamada a Claude falla o expira EL SISTEMA DEBERÁ insertar igualmente una fila en `traces` con el coste observado y responder con `code` igual a `UPSTREAM_FAILED` o `UPSTREAM_TIMEOUT`.",
+      "CUANDO se envía la segunda petición de una conversación con el mismo prefijo estable EL SISTEMA DEBERÁ registrar `cached_tokens` mayor que cero, probando que la caché de prompt acierta.",
+      "CUANDO se construye una petición EL SISTEMA DEBERÁ enviar `thinking` con tipo `adaptive` y NO DEBERÁ incluir `budget_tokens` ni un prefill de mensaje de asistente, porque ambos devuelven 400 en este modelo.",
+      "CUANDO se pide un formato estructurado EL SISTEMA DEBERÁ usar `output_config.format` y colocar `effort` dentro de `output_config`, nunca en el nivel superior.",
+      "CUANDO un módulo fuera de `the_profe-server/src/gateway/` importa el SDK de Anthropic EL SISTEMA DEBERÁ fallar el test de frontera que lo prohíbe."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/gateway/trace.test.ts",
+      "pnpm --dir the_profe-server run test tests/gateway/pricing.test.ts",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-06-pasarela-trazas",
+    "files": [
+      "the_profe-server/src/gateway/anthropic.ts",
+      "the_profe-server/src/gateway/pricing.ts",
+      "the_profe-server/src/gateway/trace.ts",
+      "the_profe-server/tests/gateway/trace.test.ts",
+      "the_profe-server/tests/gateway/pricing.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E2-T3",
+    "title": "Cuotas con ledger, reserva, liquidación y barrendero",
+    "epic": "02-columna-agente",
+    "dependencies": ["E2-T2"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se pide una sesión de voz y el saldo de segundos disponibles es suficiente EL SISTEMA DEBERÁ insertar una fila `hold` en `budget_ledger`, actualizar `voice_seconds_held` y crear una fila en `voice_sessions` con estado `queued`, todo en una sola transacción.",
+      "CUANDO el saldo disponible es menor que la reserva estimada EL SISTEMA DEBERÁ responder 402 con `code` igual a `QUOTA_EXCEEDED`, no crear ninguna fila en `voice_sessions` y dejar `budget_ledger` sin cambios.",
+      "CUANDO se lanzan 20 peticiones concurrentes de sesión contra un saldo que sólo alcanza para 5 EL SISTEMA DEBERÁ conceder exactamente 5, rechazar 15 con 402 y dejar `voice_seconds_held` igual a la suma de esas 5 reservas, sin ningún valor negativo.",
+      "CUANDO una sesión termina EL SISTEMA DEBERÁ insertar una fila `settle` con la duración real y el coste real del proveedor, y mover los segundos de `voice_seconds_held` a `voice_seconds_used`.",
+      "CUANDO se libera dos veces la misma sesión EL SISTEMA DEBERÁ dejar el saldo idéntico tras la segunda llamada, porque la clave de idempotencia está en `session_id`.",
+      "CUANDO el barrendero corre sobre una sesión sin estado terminal pasado su `expires_at` EL SISTEMA DEBERÁ marcarla `expired`, insertar una fila `release` y devolver los segundos al saldo disponible."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/budget/reserve.test.ts",
+      "pnpm --dir the_profe-server run test tests/budget/concurrency.test.ts",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-07-cuotas",
+    "files": [
+      "the_profe-server/src/budget/ledger.ts",
+      "the_profe-server/src/budget/reserve.ts",
+      "the_profe-server/src/budget/sweeper.ts",
+      "the_profe-server/tests/budget/reserve.test.ts",
+      "the_profe-server/tests/budget/concurrency.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T1",
+    "title": "Currículo sembrado y ruta de lectura de lección",
+    "epic": "03-curriculo-texto",
+    "dependencies": ["E2-T1"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO la semilla del currículo se aplica EL SISTEMA DEBERÁ crear todas las unidades A1 y A2 que el archivo de semilla define, cada una con `objectives` no vacío y con al menos un elemento de `curriculum_items` cuya `ipa` esté presente.",
+      "CUANDO la semilla se aplica dos veces seguidas EL SISTEMA DEBERÁ dejar el mismo número de filas que tras la primera aplicación, porque está escrita como inserción idempotente sobre `code`.",
+      "CUANDO un perfil autenticado pide `GET /api/v1/curriculum/units` EL SISTEMA DEBERÁ devolver 200 con sólo las unidades publicadas, ordenadas por `cefr_level` y `ordinal`.",
+      "CUANDO un perfil pide `POST /api/v1/lessons` con el código de una unidad publicada EL SISTEMA DEBERÁ crear una fila en `lessons` con `status` igual a `active` y `started_at` no nulo, y devolver 200 con su identificador.",
+      "CUANDO un perfil pide una lección de otro perfil EL SISTEMA DEBERÁ responder 404 con `code` igual a `NOT_FOUND`, nunca 200 con datos ajenos.",
+      "CUANDO se revisa el temario EL SISTEMA DEBERÁ incluir al menos una unidad dedicada a vocales nasales, una a la ese final que suena /ʃ/ y una a los falsos amigos con el español."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/db/seed.test.ts",
+      "pnpm --dir the_profe-server run test tests/http/curriculum.test.ts",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-08-curriculo-lecciones",
+    "files": [
+      "supabase/seed/curriculum_a1_a2.sql",
+      "the_profe-server/src/routes/curriculum.ts",
+      "the_profe-server/src/routes/lessons.ts",
+      "the_profe-server/tests/db/seed.test.ts",
+      "the_profe-server/tests/http/curriculum.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T2",
+    "title": "Ejercicios de lectura en cliente y servidor",
+    "epic": "03-curriculo-texto",
+    "dependencies": ["E3-T1", "E1-T4"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se abre una lección activa EL SISTEMA DEBERÁ crear sus ejercicios de tipo `read` con `ordinal` consecutivo desde 1 y sin huecos.",
+      "CUANDO se renderiza un ejercicio de lectura EL SISTEMA DEBERÁ mostrar el texto portugués en la familia serif y la glosa española y la interfaz en la familia sans, sin cruzarlas.",
+      "CUANDO se renderiza una transcripción fonética EL SISTEMA DEBERÁ usar la familia CharisSIL, de modo que ɐ̃ ʃ ʎ ɲ ɨ ɾ se dibujen como glifos y no como cuadros vacíos.",
+      "CUANDO un ejercicio de lectura se responde EL SISTEMA DEBERÁ insertar una fila en `attempts` con `score` entre 0 y 100 y avanzar el `ordinal` activo de la lección.",
+      "CUANDO se responden todos los ejercicios de una lección EL SISTEMA DEBERÁ poner su `status` en `completed` y `completed_at` no nulo.",
+      "CUANDO la petición de ejercicios falla EL SISTEMA DEBERÁ renderizar el estado de error con reintento, no una pantalla en blanco."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/http/exercises-read.test.ts",
+      "pnpm --dir the_profe-app run typecheck",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-09-ejercicios-lectura",
+    "files": [
+      "the_profe-server/src/exercises/read.ts",
+      "the_profe-server/src/routes/exercises.ts",
+      "the_profe-app/lib/api.ts",
+      "the_profe-app/features/lesson/ReadExercise.tsx",
+      "the_profe-server/tests/http/exercises-read.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T3",
+    "title": "Ejercicios de escritura corregidos por el modelo",
+    "epic": "03-curriculo-texto",
+    "dependencies": ["E3-T2", "E2-T2"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se envía una respuesta escrita EL SISTEMA DEBERÁ devolver una corrección estructurada con la lista de errores, cada uno con su tipo en `phoneme`, `lexeme` o `grammar_rule` y su clave, validada contra el esquema antes de persistirse.",
+      "CUANDO la corrección se completa EL SISTEMA DEBERÁ insertar una fila en `attempts` con `feedback` no nulo y una fila por error en `error_items`, resolviendo el conflicto sobre `(profile_id, kind, key)` para no duplicar.",
+      "CUANDO la respuesta contiene un falso amigo con el español EL SISTEMA DEBERÁ marcarlo como error de tipo `lexeme` y nombrar la palabra española que lo induce.",
+      "CUANDO se corrige un ejercicio rutinario EL SISTEMA DEBERÁ usar `effort` igual a `low` dentro de `output_config`, y CUANDO interpreta un informe fonémico DEBERÁ usar `high`.",
+      "CUANDO el modelo devuelve una salida que no valida contra el esquema EL SISTEMA DEBERÁ responder con `code` igual a `UPSTREAM_FAILED` y no escribir ninguna fila en `error_items`.",
+      "CUANDO la corrección termina EL SISTEMA DEBERÁ haber escrito una fila en `traces` para esa llamada."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/exercises/write.test.ts",
+      "pnpm --dir the_profe-server run test tests/exercises/write-errors.test.ts",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-10-ejercicios-escritura",
+    "files": [
+      "the_profe-server/src/exercises/write.ts",
+      "the_profe-server/src/prompts/correct-writing.md",
+      "the_profe-app/features/lesson/WriteExercise.tsx",
+      "the_profe-server/tests/exercises/write.test.ts",
+      "the_profe-server/tests/exercises/write-errors.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E3-T4",
+    "title": "Motor de repetición espaciada sobre error_items",
+    "epic": "03-curriculo-texto",
+    "dependencies": ["E3-T3"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO un error se acierta EL SISTEMA DEBERÁ incrementar su `strength` en 1 hasta un máximo de 8 y adelantar su `due_at` según el intervalo de ese nivel.",
+      "CUANDO un error se falla EL SISTEMA DEBERÁ reducir su `strength` a como máximo 1 y poner su `due_at` a no más de 10 minutos en el futuro.",
+      "CUANDO se pide `GET /api/v1/review/due` EL SISTEMA DEBERÁ devolver sólo los errores del perfil con `due_at` menor o igual a ahora, ordenados por `due_at` ascendente.",
+      "CUANDO no hay errores vencidos EL SISTEMA DEBERÁ devolver 200 con una lista vacía y el cliente DEBERÁ renderizar su estado vacío, nunca un error.",
+      "CUANDO se generan los ejercicios del día EL SISTEMA DEBERÁ priorizar los errores de tipo `phoneme` sobre los de tipo `lexeme` con el mismo `due_at`, porque la fonética es el cuello de botella del hispanohablante.",
+      "CUANDO se califica un error dos veces con la misma clave de idempotencia EL SISTEMA DEBERÁ dejar `strength` y `due_at` idénticos tras la segunda llamada."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/srs/schedule.test.ts",
+      "pnpm --dir the_profe-server run test tests/http/review.test.ts",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-11-repeticion-espaciada",
+    "files": [
+      "the_profe-server/src/srs/schedule.ts",
+      "the_profe-server/src/routes/review.ts",
+      "the_profe-app/features/review/DueList.tsx",
+      "the_profe-server/tests/srs/schedule.test.ts",
+      "the_profe-server/tests/http/review.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T1",
+    "title": "Pipeline de TTS con caché compartida en Storage",
+    "epic": "04-voz-afinar",
+    "dependencies": ["E2-T3", "E3-T1"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se pide sintetizar un texto por primera vez EL SISTEMA DEBERÁ llamar a Azure TTS, guardar el audio en el almacén, insertar una fila en `audio_assets` con `kind` igual a `tts_cache`, `text_hash` y `voice`, y escribir una fila en `traces` con los caracteres facturados.",
+      "CUANDO se pide el mismo texto con la misma voz una segunda vez EL SISTEMA DEBERÁ servirlo desde la caché sin llamar a Azure y escribir una traza con `cost_micros` igual a 0.",
+      "CUANDO dos perfiles distintos piden el mismo texto con la misma voz EL SISTEMA DEBERÁ servir a los dos desde la misma fila de caché, porque `tts_cache` es legible por todos los perfiles autenticados.",
+      "CUANDO se calcula `text_hash` EL SISTEMA DEBERÁ hacerlo sobre el texto normalizado, de modo que dos textos que sólo difieren en espacios o en mayúsculas iniciales produzcan el mismo acierto de caché.",
+      "CUANDO se consulta el endpoint de lista de voces de la región configurada EL SISTEMA DEBERÁ encontrar en la respuesta el nombre corto de la voz configurada, validando el supuesto en lugar de confiar en la documentación.",
+      "CUANDO falta la clave de Azure EL SISTEMA DEBERÁ fallar al arrancar con un error que la nombre, y no intentar la llamada."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/voice/tts-cache.test.ts",
+      "pnpm --dir the_profe-server run test tests/voice/tts-hash.test.ts",
+      "set -a; . ./the_profe-server/.env; set +a; curl -sf -H \"Ocp-Apim-Subscription-Key: $AZURE_SPEECH_KEY\" \"https://$AZURE_SPEECH_REGION.tts.speech.microsoft.com/cognitiveservices/voices/list\" | jq -e --arg v \"$AZURE_TTS_VOICE\" 'any(.[]; .ShortName == $v)'",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-12-tts-cache",
+    "files": [
+      "the_profe-server/src/voice/tts.ts",
+      "the_profe-server/src/voice/storage.ts",
+      "the_profe-server/src/routes/tts.ts",
+      "the_profe-server/tests/voice/tts-cache.test.ts",
+      "the_profe-server/tests/voice/tts-hash.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T2",
+    "title": "Captura de audio en el cliente y relé WebSocket",
+    "epic": "04-voz-afinar",
+    "dependencies": ["E4-T1"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO el cliente pide una sesión de voz EL SISTEMA DEBERÁ abrir el micrófono sólo después de una reserva confirmada, y CUANDO la respuesta es 402 NO DEBERÁ abrirlo en absoluto.",
+      "CUANDO el WebSocket está abierto EL SISTEMA DEBERÁ enviar un ping de mantenimiento cada 20 segundos en ambos sentidos, para que el proxy no corte la conexión en silencio.",
+      "CUANDO el cliente envía tramas de audio EL SISTEMA DEBERÁ reenviarlas al proveedor sin esperar al final del turno, de modo que ninguna etapa de la ruta bufferice la entrada completa.",
+      "CUANDO el socket se cierra sin haber liquidado la sesión EL SISTEMA DEBERÁ insertar una fila `release` y devolver los segundos reservados al saldo.",
+      "CUANDO el anillo del micrófono se anima EL SISTEMA DEBERÁ usar la amplitud real de entrada, y CUANDO la preferencia de reducir movimiento está activa DEBERÁ mostrar una barra de nivel estática en lugar de eliminar la señal.",
+      "CUANDO un módulo del cliente importa el SDK de Azure Speech EL SISTEMA DEBERÁ fallar el test de frontera, porque ese SDK no funciona dentro de React Native."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/ws/afinar.test.ts",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-13-rele-audio",
+    "files": [
+      "the_profe-server/src/ws/afinar.ts",
+      "the_profe-server/tests/ws/afinar.test.ts",
+      "the_profe-app/features/voice/useRecorder.ts",
+      "the_profe-app/features/voice/MicRing.tsx",
+      "the_profe-app/tests/recorder.test.tsx"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E4-T3",
+    "title": "Azure STT con evaluación de pronunciación y medidor de fonemas",
+    "epic": "04-voz-afinar",
+    "dependencies": ["E4-T2"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO una sesión en modo Afinar reconoce voz EL SISTEMA DEBERÁ pedir la evaluación de pronunciación con granularidad de fonema e insertar una fila en `pronunciation_scores` con `accuracy`, `fluency`, `completeness`, `words` y `phonemes`.",
+      "CUANDO se persiste una puntuación EL SISTEMA DEBERÁ no escribir ninguna columna de prosodia, porque la prosodia es exclusiva de en-US y una columna siempre nula es peor que su ausencia.",
+      "CUANDO una sesión está en modo Conversar EL SISTEMA DEBERÁ emitir cero llamadas con evaluación de pronunciación activada, para no pagar el recargo por hora que sólo corresponde a Afinar.",
+      "CUANDO un fonema puntúa 80 o más EL SISTEMA DEBERÁ mostrarlo en la banda oliva, entre 60 y 79 en ámbar y por debajo de 60 en terracota, y en los tres casos DEBERÁ acompañar el color con una etiqueta textual y una forma distinta.",
+      "CUANDO la puntuación produce errores de fonema EL SISTEMA DEBERÁ insertarlos o actualizarlos en `error_items` con tipo `phoneme`, de modo que la repetición espaciada los recoja.",
+      "CUANDO se guarda una grabación del usuario EL SISTEMA DEBERÁ fijar su `retention_until` y marcarla como privada de su dueño, nunca legible por otro perfil."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/voice/pronunciation.test.ts",
+      "pnpm --dir the_profe-server run test tests/voice/no-prosody-in-converse.test.ts",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-14-azure-pronunciacion",
+    "files": [
+      "the_profe-server/src/voice/azure-stt.ts",
+      "the_profe-server/src/voice/score.ts",
+      "the_profe-app/features/voice/PhonemeMeter.tsx",
+      "the_profe-server/tests/voice/pronunciation.test.ts",
+      "the_profe-server/tests/voice/no-prosody-in-converse.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E5-T1",
+    "title": "Relé de Gemini Live en pt-PT con barge-in",
+    "epic": "05-voz-conversar",
+    "dependencies": ["E4-T3"],
+    "priority": "p0",
+    "acceptance": [
+      "CUANDO se abre una sesión de Conversar EL SISTEMA DEBERÁ conectar con un modelo de semi-cascada y fijar el código de idioma de `speech_config` a `pt-PT`, nunca con un modelo de audio nativo, que no admite fijar el idioma.",
+      "CUANDO se escribe el identificador del modelo en la configuración EL SISTEMA DEBERÁ haberlo resuelto antes contra la documentación en vivo y haber registrado la fuente, porque la lista de modelos que admiten fijar el idioma quedó sin verificar.",
+      "CUANDO el usuario interrumpe al tutor EL SISTEMA DEBERÁ parar la reproducción en 200 ms o menos Y truncar el historial de la conversación a las palabras que realmente se reprodujeron.",
+      "CUANDO se persiste un turno interrumpido EL SISTEMA DEBERÁ marcar `barge_in` en verdadero y guardar como `transcript` sólo lo que el usuario oyó, no lo que el modelo generó.",
+      "CUANDO la sesión termina EL SISTEMA DEBERÁ liquidar la reserva con los segundos reales y escribir una fila en `traces` con `provider` igual a `gemini_live` y los tokens de audio de entrada y salida.",
+      "CUANDO el proveedor se cae en mitad de la sesión EL SISTEMA DEBERÁ cerrar limpiamente, liberar la reserva y devolver `code` igual a `UPSTREAM_FAILED`, sin dejar la sesión colgada en `running`."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/voice/barge-in.test.ts",
+      "pnpm --dir the_profe-server run test tests/voice/gemini-config.test.ts",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-15-gemini-conversar",
+    "files": [
+      "the_profe-server/src/voice/gemini-live.ts",
+      "the_profe-server/src/ws/conversar.ts",
+      "the_profe-app/features/voice/ConverseScreen.tsx",
+      "the_profe-server/tests/voice/barge-in.test.ts",
+      "the_profe-server/tests/voice/gemini-config.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E5-T2",
+    "title": "Instrumentación de latencia por segmento y panel",
+    "epic": "05-voz-conversar",
+    "dependencies": ["E5-T1"],
+    "priority": "p1",
+    "acceptance": [
+      "CUANDO un turno de voz se completa EL SISTEMA DEBERÁ persistir en la fila de `turns` los cinco campos de latencia por segmento —captura, reconocimiento, primer token del modelo, primer audio sintetizado y total— cada uno por separado y nunca sólo el total.",
+      "CUANDO se consulta el resumen de latencia EL SISTEMA DEBERÁ devolver p50 y p95 por segmento y nombrar el segmento más lento, para que se pueda atribuir el retraso.",
+      "CUANDO la suma de los segmentos no cuadra con la latencia total dentro de un margen de 50 ms EL SISTEMA DEBERÁ registrar una advertencia, porque significa que hay una etapa sin instrumentar.",
+      "CUANDO un turno excede 800 ms desde la última sílaba del usuario hasta el primer audio del tutor EL SISTEMA DEBERÁ marcarlo en el resumen como fuera de presupuesto.",
+      "CUANDO el panel de latencia se renderiza sin turnos EL SISTEMA DEBERÁ mostrar su estado vacío en lugar de una gráfica de ceros."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/voice/latency.test.ts",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-16-latencia",
+    "files": [
+      "the_profe-server/src/voice/latency.ts",
+      "the_profe-server/src/routes/latency.ts",
+      "the_profe-app/features/diagnostics/LatencyPanel.tsx",
+      "the_profe-server/tests/voice/latency.test.ts"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E6-T1",
+    "title": "Arnés de evaluación con casos dorados y CI",
+    "epic": "06-endurecimiento-entrega",
+    "dependencies": ["E3-T4", "E5-T2"],
+    "priority": "p1",
+    "acceptance": [
+      "CUANDO el arnés se ejecuta EL SISTEMA DEBERÁ puntuar todos los casos del archivo de casos de texto y devolver una tasa de acierto por etiqueta, nunca un único número agregado.",
+      "CUANDO la tasa de acierto de cualquier suite queda por debajo del umbral de la línea base comprometida EL SISTEMA DEBERÁ salir con código 1 y nombrar la suite y la etiqueta que bajó.",
+      "CUANDO la tasa de acierto iguala o supera el umbral EL SISTEMA DEBERÁ salir con 0 e imprimir la tasa por etiqueta.",
+      "CUANDO el arnés corre dos veces sobre los mismos casos y el mismo doble de proveedor EL SISTEMA DEBERÁ producir la misma tasa, porque la puntuación no depende del orden de ejecución.",
+      "CUANDO el flujo de integración continua se ejecuta EL SISTEMA DEBERÁ correr typecheck, lint, pruebas y el arnés de los dos paquetes, y fallar el trabajo si cualquiera de ellos falla.",
+      "CUANDO los casos de audio no se pueden ejecutar sin grabaciones reales EL SISTEMA DEBERÁ omitir esa suite declarándolo explícitamente en la salida, en lugar de darla por pasada."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run db:local:reset",
+      "pnpm --dir the_profe-server run test tests/eval/runner.test.ts",
+      "pnpm --dir the_profe-server run build",
+      "pnpm --dir the_profe-server run eval",
+      "pnpm --dir the_profe-server run lint"
+    ],
+    "checkpoint": "step-17-arnes-eval",
+    "files": [
+      "the_profe-server/src/eval/runner.ts",
+      "the_profe-server/eval/cases/text.json",
+      "the_profe-server/eval/baseline.json",
+      "the_profe-server/tests/eval/runner.test.ts",
+      ".github/workflows/ci.yml"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "E6-T2",
+    "title": "Telemetría, imagen de despliegue y distribución interna",
+    "epic": "06-endurecimiento-entrega",
+    "dependencies": ["E6-T1"],
+    "priority": "p1",
+    "acceptance": [
+      "CUANDO el backend registra un evento EL SISTEMA DEBERÁ emitir JSON estructurado en una sola línea con un identificador de petición, y NO DEBERÁ incluir ninguna clave de proveedor, token de sesión ni transcripción completa.",
+      "CUANDO se construye la imagen del backend y se arranca el contenedor EL SISTEMA DEBERÁ responder 200 en `GET /healthz`, probando que la ruta que emite el build es la que arranca el contenedor.",
+      "CUANDO el cliente captura un error no manejado EL SISTEMA DEBERÁ pasarlo al reportero configurado, y CUANDO no hay destino de reporte configurado DEBERÁ registrarlo localmente sin fallar.",
+      "CUANDO se inspecciona `the_profe-app/eas.json` EL SISTEMA DEBERÁ encontrar los tres perfiles `development`, `preview` y `production`, cada uno con su canal y su variante de identificador.",
+      "CUANDO el flujo de release se ejecuta EL SISTEMA DEBERÁ construir la imagen del backend y validar la configuración de EAS sin publicar nada, dejando la subida a tiendas fuera del build.",
+      "CUANDO `pnpm --dir the_profe-server run test` se ejecuta EL SISTEMA DEBERÁ salir con 0, 0 fallos y 0 omitidos."
+    ],
+    "verify": [
+      "pnpm --dir the_profe-server run typecheck",
+      "pnpm --dir the_profe-server run test tests/obs/logger.test.ts",
+      "pnpm --dir the_profe-server run test",
+      "jq -e '.build.development and .build.preview and .build.production' the_profe-app/eas.json",
+      "docker build -t profe-server:ci the_profe-server",
+      "docker run --rm -d --name profe-ci -p 8788:8787 -e PORT=8787 -e NODE_ENV=production -e SKIP_DB_CHECK=1 profe-server:ci; sleep 5; curl -sf http://127.0.0.1:8788/healthz | jq -e '.ok == true'; RC=$?; docker rm -f profe-ci >/dev/null; exit $RC",
+      "pnpm --dir the_profe-app run test",
+      "pnpm --dir the_profe-app run lint"
+    ],
+    "checkpoint": "step-18-telemetria-entrega",
+    "files": [
+      "the_profe-server/src/obs/logger.ts",
+      "the_profe-app/lib/reporting.ts",
+      ".github/workflows/release.yml",
+      "docs/LANZAMIENTO.md",
+      "the_profe-server/tests/obs/logger.test.ts"
+    ],
+    "status": "pending"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "//": "ÚNICA dueña de la ruta de salida del backend. rootDir=src + outDir=dist significa que src/server.ts emite dist/server.js, que es exactamente lo que declara `main` en package.json, lo que arranca `pnpm run start`, lo que ejecuta el CMD del Dockerfile y lo que curlean los Verify. Ver §19.6, tabla de reconciliación de valores entre artefactos.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": false,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "tests", "scripts", "../blueprints", "../client"]
+}

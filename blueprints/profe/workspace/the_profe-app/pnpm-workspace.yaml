@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# profe — ajustes de pnpm del CLIENTE.
+#
+# POR QUÉ ESTE ARCHIVO Y NO `.npmrc`: pnpm moderno lee de `.npmrc` **sólo**
+# autenticación y registro. Todo lo demás vive aquí. Un `node-linker=hoisted`
+# puesto en `.npmrc` se ignora en silencio, que es la forma más cara de
+# equivocarse: parece configurado y no lo está.
+#
+# No hace falta el campo `packages:`. Cuando se omite, el paquete raíz es el
+# único miembro — que es exactamente este caso: `the_profe-app/` no es un monorepo.
+# ---------------------------------------------------------------------------
+
+# OBLIGATORIO PARA EXPO. React Native y Metro esperan un `node_modules` plano;
+# el enlazado aislado por defecto de pnpm usa symlinks y rompe la resolución de
+# módulos nativos con errores que hablan de un paquete que no encuentra, no del
+# enlazador. Es la recomendación de la propia documentación de Expo.
+#
+# El servidor NO lleva esta línea: allí se conserva el aislamiento estricto, que
+# es donde de verdad protege, porque es el paquete que maneja las claves.
+nodeLinker: hoisted
+
+# Scripts de instalación permitidos. pnpm NO ejecuta scripts de dependencias que
+# no estén aquí, y con `strictDepBuilds` (activo por defecto) la instalación
+# FALLA en vez de avisar. Eso es la protección de cadena de suministro, no un
+# estorbo: un paquete comprometido no puede ejecutar nada en tu máquina sin que
+# alguien lo haya aprobado antes.
+#
+# Esta lista es un PUNTO DE PARTIDA, no la lista final. En la primera
+# instalación pnpm añade aquí, con un valor provisional, cualquier dependencia
+# con scripts que no esté listada, y falla. Revisa cada una y ponla a `true` o
+# `false` a conciencia — ese momento de revisión es justamente el propósito del
+# mecanismo. `pnpm approve-builds` lo hace de forma interactiva.
+allowBuilds:
+  esbuild: true
+  # Revisado el 2026-09-30. Lo arrastra `eslint-import-resolver-typescript`, que
+  # viene de `eslint-config-expo`: es el lint que dicta el propio SDK, no algo
+  # que hayamos elegido. Su `postinstall` son cuatro líneas que llaman a
+  # `napi-postinstall` para enlazar el binario nativo que YA está entre las
+  # `optionalDependencies` resueltas por el lockfile — no descarga de ninguna
+  # URL en tiempo de instalación. Patrón napi estándar, riesgo bajo.
+  unrs-resolver: true
+
+# Retraso mínimo antes de adoptar una versión recién publicada, en minutos.
+# 1440 = 24 horas. Es el valor por defecto desde pnpm 11 y se deja explícito
+# para que se lea: la mayoría de los paquetes comprometidos se detectan y se
+# retiran en las primeras horas, así que esperar un día evita casi toda esa
+# ventana sin coste real para un proyecto que no persigue el último parche.
+minimumReleaseAge: 1440

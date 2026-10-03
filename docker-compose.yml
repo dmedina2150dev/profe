@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# profe — Postgres local para los gates de §9 (esquema, RLS, cuotas, caché TTS).
+#
+# NO es Supabase completo: es Postgres a secas más el esqueleto de `auth` que
+# aplica `the_profe-server/tests/sql/00_auth_stub.sql`. Basta para probar RLS y las
+# transacciones de cuota, y evita levantar toda la pila de Supabase en cada
+# gate. La base de datos de producción es Supabase; las migraciones son las
+# mismas en ambas.
+#
+# Esta herramienta no camina el árbol de archivos, así que no necesita excluir
+# `blueprints/`. El montaje de `./` en `/repo` es de solo lectura para que un
+# `psql -f` nunca pueda escribir en el repositorio.
+# ---------------------------------------------------------------------------
+name: profe
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: profe-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: profe_test
+      # Colación estable: el orden de `order by` en los tests no debe depender
+      # del locale de la máquina que ejecuta el build.
+      LANG: C
+      POSTGRES_INITDB_ARGS: "--locale=C --encoding=UTF8"
+    ports:
+      # 55432 en el host, no 5432: no colisiona con un Postgres ya instalado.
+      - "55432:5432"
+    volumes:
+      - profe_db_data:/var/lib/postgresql/data
+      - ./:/repo:ro
+    healthcheck:
+      # `docker compose up -d --wait` sólo devuelve 0 cuando esto pasa, así que
+      # ningún test corre contra una base que todavía no acepta conexiones.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d profe_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+volumes:
+  profe_db_data:

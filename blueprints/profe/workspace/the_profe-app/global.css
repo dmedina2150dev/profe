@@ -1,0 +1,11 @@
+/* ---------------------------------------------------------------------------
+   profe — directivas de Tailwind, importadas una sola vez en app/_layout.tsx.
+
+   Aquí NO se declaran colores: la capa primitiva vive en constants/theme.ts y
+   la semántica en tailwind.config.js. Un hex en este archivo sería una tercera
+   copia de la misma decisión.
+   --------------------------------------------------------------------------- */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

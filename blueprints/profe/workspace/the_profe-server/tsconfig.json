@@ -1,0 +1,22 @@
+{
+  "//": "El convenio de imports del backend es la extensión .ts literal, porque `node scripts/check-env.ts` resuelve especificadores literalmente; `allowImportingTsExtensions` y `rewriteRelativeImportExtensions` son lo que lo hace compilar y emitir bien. Ver §19.6, matriz de convenio de resolución. Aviso: TypeScript acepta una clave `//` en la RAÍZ, pero rechaza cualquier clave desconocida dentro de `compilerOptions` con TS5025 — un comentario ahí dentro hace fallar `typecheck` para siempre. Verificado el 2026-09-30. ",
+  "//2": "Configuración de COMPROBACIÓN de tipos: cubre src, tests y scripts. No emite. La configuración que EMITE es tsconfig.build.json, y es la única dueña de outDir.",
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["es2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node"],
+
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", "dist", "../blueprints", "../client"]
+}

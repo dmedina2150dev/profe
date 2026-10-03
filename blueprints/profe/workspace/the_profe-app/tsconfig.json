@@ -1,0 +1,19 @@
+{
+  "//": "El convenio de imports del cliente es el alias `@/` sin extensión, resuelto por `paths` aquí, por la base de Expo en Metro y por moduleNameMapper en jest.config.js. Ver §19.6, matriz de convenio de resolución.",
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": ["node_modules", ".expo", "dist", "../blueprints"]
+}

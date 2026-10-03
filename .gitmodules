@@ -1,0 +1,6 @@
+[submodule "the_profe-app"]
+	path = the_profe-app
+	url = git@github.com:EL-Profe-Portugues/the_profe-app.git
+[submodule "the_profe-server"]
+	path = the_profe-server
+	url = git@github.com:EL-Profe-Portugues/the_profe-server.git
